@@ -3,13 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import Search from "./components/Search";
 import { API_BASE_URL, API_OPTIONS } from "./api/config";
 import Spinner from "./components/Spinner";
+import Card from "./components/Card";
 
-interface Movie {
+export interface Movie {
   id: number;
   title: string;
   vote_average: number;
   vote_count: number;
   poster_path: string;
+  release_date: string;
+  original_language: string;
 }
 
 const fetchMovies = async () => {
@@ -56,9 +59,7 @@ function App() {
             ) : (
               <ul>
                 {data.results.map((movie: Movie) => (
-                  <li key={movie.id} className="text-white">
-                    {movie.title}
-                  </li>
+                  <Card key={movie.id} movie={movie} />
                 ))}
               </ul>
             )}
