@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 import Search from "./components/Search";
 import { API_BASE_URL, API_OPTIONS } from "./api/config";
 import Spinner from "./components/Spinner";
@@ -15,8 +15,14 @@ export interface Movie {
   original_language: string;
 }
 
-const fetchMovies = async () => {
-  const endpoint = `${API_BASE_URL}?sort_by=popularity.desc`;
+const fetchMovies = async ({
+  queryKey,
+}: QueryFunctionContext<[string, string]>): Promise<any> => {
+  const query = queryKey[1];
+
+  const endpoint = query
+    ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+    : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
   const response = await fetch(endpoint, API_OPTIONS);
   if (!response.ok) throw new Error("Failed to get movies");
@@ -29,11 +35,9 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["fetchMovies"],
+    queryKey: ["fetchMovies", searchTerm],
     queryFn: fetchMovies,
   });
-
-  console.log(data);
 
   return (
     <>
