@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
+import { useDebounce } from "react-use";
 import Search from "./components/Search";
 import { API_BASE_URL, API_OPTIONS } from "./api/config";
 import Spinner from "./components/Spinner";
@@ -33,9 +34,12 @@ const fetchMovies = async ({
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["fetchMovies", searchTerm],
+    queryKey: ["fetchMovies", debouncedSearchTerm],
     queryFn: fetchMovies,
   });
 
